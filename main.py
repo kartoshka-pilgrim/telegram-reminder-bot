@@ -12,12 +12,15 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 DATE_FORMAT= "%Y-%m-%d"
 
 # setup
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive'
+]
 creds = Credentials.from_service_account_file("service_account.json", scopes=SCOPES)
 gc = gspread.authorize(creds)
 
 # sheet
-SHEET_NAME = "teachings_google_template"
+SHEET_ID = "https://docs.google.com/spreadsheets/d/1pJL1GixBfPTSlQPORbpJrHTj9S6dDEcDhJ-feVQDyc0/edit?usp=sharing"
 sheet = gc.open(SHEET_NAME).sheet1
 
 # telegram
