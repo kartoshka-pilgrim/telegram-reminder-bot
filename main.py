@@ -48,18 +48,18 @@ def save_dataframe(df):
 def register_teacher(chat_id, name):
     df = get_dataframe()
     found = False
-
+    
     for i, row in df.iterrows():
         if row["Teacher Name"].strip().lower() == name.strip().lower():
             df.at[i, "Chat ID"] = chat_id
             found = True
             send_message(chat_id, f"Registered successfully, {name}! You'll receive reminders for your classes.")
             break
-
-        if not found:
-            send_message(chat_id, f"Your name '{name}' was not found in the sheet. Please contact the admin.")
-
-        save_dataframe(df)
+    
+    if not found:
+        send_message(chat_id, f"Your name '{name}' was not found in the sheet. Please contact the admin.")
+    
+    save_dataframe(df)
 
 # reminder
 def check_and_send_reminders():
@@ -94,6 +94,21 @@ def check_and_send_reminders():
     save_dataframe(df)
     print("Checked reminders at", datetime.now())
 
+def test_reminders_now():
+    """Send test reminder immediately to all registered users"""
+    print("Sending test reminders...")
+    df = get_dataframe()
+    for i, row in df.iterrows():
+        chat_id = row.get("Chat ID")
+        if chat_id and str(chat_id) != "":  # Send to all registered users
+            lesson_type = row.get("Lesson Type", "a class")
+            if not lesson_type or pd.isna(lesson_type):
+                lesson_type = "a class"
+            teaching_date = row.get("Teaching Date", "TBD")
+            teacher_name = row.get("Teacher Name", "")
+            send_message(chat_id, f"🧪 TEST: You have {lesson_type} on {teaching_date}.")
+            print(f"Sent test to {teacher_name} (Chat ID: {chat_id})")
+
 def listen_for_new_users():
     print("Listening for new Telegram messages...")
     offset = None
@@ -117,26 +132,14 @@ def start_scheduler():
         schedule.run_pending()
         time.sleep(60)
 
-# test
-def test_reminders_now():
-    """Test function - sends reminder regardless of date"""
-    df = get_dataframe()
-    for i, row in df.iterrows():
-        chat_id = row.get("Chat ID")
-        if chat_id and row["Teacher Name"] == "Kami Test":  # Replace with your name
-            lesson_type = row.get("Lesson Type", "a class")
-            teaching_date = row.get("Teaching Date", "TBD")
-            send_message(chat_id, f"TEST: You have {lesson_type} on {teaching_date}.")
-            print(f"Sent test message to {row['Teacher Name']}")
-            
 # main
 if __name__ == "__main__":
     import threading
     threading.Thread(target=listen_for_new_users, daemon=True).start()
     print("Bot started using Google Sheets...")
-
-    # Test immediately on startup
-    time.sleep(5)  # Wait for bot to fully start
+    
+    # Send test message after 5 seconds
+    time.sleep(5)
     test_reminders_now()
     
     start_scheduler()
