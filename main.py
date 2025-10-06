@@ -74,18 +74,25 @@ def check_and_send_reminders():
         if not chat_id:
             continue
 
+        # Get lesson type (with fallback if empty)
+        lesson_type = row.get("Lesson Type", "")
+        if not lesson_type or pd.isna(lesson_type):
+            lesson_info = "a class"
+        else:
+            lesson_info = lesson_type  # "Teaching Corinthians"
+
         # 7-day
-        if not row ["Reminder Sent (7d)"] and teaching_date - today == timedelta(days=7):
-            send_message(chat_id, f"Reminder: You have a class on {teaching_date} (in 7 days).")
+        if not row["Reminder Sent (7d)"] and teaching_date - today == timedelta(days=7):
+            send_message(chat_id, f"Reminder: You have {lesson_info} on {teaching_date} (in 7 days).")
             df.at[i, "Reminder Sent (7d)"] = True
 
         # 2-day
-        if not row ["Reminder Sent (7d)"] and teaching_date - today == timedelta(days=2):
-            send_message(chat_id, f"Reminder: You have a class on {teaching_date} (in 2 days).")
+        if not row["Reminder Sent (2d)"] and teaching_date - today == timedelta(days=2):
+            send_message(chat_id, f"Reminder: You have {lesson_info} on {teaching_date} (in 2 days).")
             df.at[i, "Reminder Sent (2d)"] = True
 
-        save_dataframe(df)
-        print("Checked reminders at", datetime.now())
+    save_dataframe(df)
+    print("Checked reminders at", datetime.now())
 
 def listen_for_new_users():
     print("Listening for new Telegram messages...")
