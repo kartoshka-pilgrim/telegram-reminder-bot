@@ -117,9 +117,26 @@ def start_scheduler():
         schedule.run_pending()
         time.sleep(60)
 
+# test
+def test_reminders_now():
+    """Test function - sends reminder regardless of date"""
+    df = get_dataframe()
+    for i, row in df.iterrows():
+        chat_id = row.get("Chat ID")
+        if chat_id and row["Teacher Name"] == "Kami Test":  # Replace with your name
+            lesson_type = row.get("Lesson Type", "a class")
+            teaching_date = row.get("Teaching Date", "TBD")
+            send_message(chat_id, f"TEST: You have {lesson_type} on {teaching_date}.")
+            print(f"Sent test message to {row['Teacher Name']}")
+            
 # main
 if __name__ == "__main__":
     import threading
     threading.Thread(target=listen_for_new_users, daemon=True).start()
     print("Bot started using Google Sheets...")
+
+    # Test immediately on startup
+    time.sleep(5)  # Wait for bot to fully start
+    test_reminders_now()
+    
     start_scheduler()
