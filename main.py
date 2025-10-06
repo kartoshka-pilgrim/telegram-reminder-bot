@@ -20,7 +20,7 @@ creds = Credentials.from_service_account_file("service_account.json", scopes=SCO
 gc = gspread.authorize(creds)
 
 # sheet
-SHEET_ID = "https://docs.google.com/spreadsheets/d/1pJL1GixBfPTSlQPORbpJrHTj9S6dDEcDhJ-feVQDyc0/edit?usp=sharing"
+SHEET_ID = "1pJL1GixBfPTSlQPORbpJrHTj9S6dDEcDhJ-feVQDyc0"
 sheet = gc.open_by_key(SHEET_ID).sheet1
 
 # telegram
