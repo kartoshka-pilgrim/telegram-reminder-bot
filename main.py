@@ -151,7 +151,7 @@ if __name__ == "__main__":
     print("Bot started using Google Sheets...")
     
     # Send test message after 5 seconds
-    time.sleep(5)
-    test_reminders_now()
+    # time.sleep(5)
+    # test_reminders_now()
     
     start_scheduler()
