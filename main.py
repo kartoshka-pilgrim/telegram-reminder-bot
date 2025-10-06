@@ -94,23 +94,8 @@ def check_and_send_reminders():
     save_dataframe(df)
     print("Checked reminders at", datetime.now())
 
-def test_reminders_now():
-    """Send test reminder immediately to all registered users"""
-    print("Sending test reminders...")
-    df = get_dataframe()
-    for i, row in df.iterrows():
-        chat_id = row.get("Chat ID")
-        if chat_id and str(chat_id) != "":  # Send to all registered users
-            lesson_type = row.get("Lesson Type", "a class")
-            if not lesson_type or pd.isna(lesson_type):
-                lesson_type = "a class"
-            teaching_date = row.get("Teaching Date", "TBD")
-            teacher_name = row.get("Teacher Name", "")
-            send_message(chat_id, f"🧪 TEST: You have {lesson_type} on {teaching_date}.")
-            print(f"Sent test to {teacher_name} (Chat ID: {chat_id})")
-
 def listen_for_new_users():
-    print("Listening for new Telegram messages...")
+    print("Listening for new Telegram messages... ")
     offset = None
     while True:
         updates = get_updates(offset)
@@ -136,10 +121,6 @@ def start_scheduler():
 if __name__ == "__main__":
     import threading
     threading.Thread(target=listen_for_new_users, daemon=True).start()
-    print("Bot started using Google Sheets...")
-    
-    # Send test message after 5 seconds
-    time.sleep(5)
-    test_reminders_now()
+    print("Bot started using Google Sheets... ")
     
     start_scheduler()
