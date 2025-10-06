@@ -83,7 +83,7 @@ def check_and_send_reminders():
         if not lesson_type or pd.isna(lesson_type):
             lesson_info = "a class"
         else:
-            lesson_info = lesson_type  # "Teaching Corinthians"
+            lesson_info = lesson_type
 
         # 7-day
         if not row["Reminder Sent (7d)"] and teaching_date - today == timedelta(days=7):
@@ -98,20 +98,43 @@ def check_and_send_reminders():
     save_dataframe(df)
     print("Checked reminders at", datetime.now())
 
+def test_reminders_now():
+    """Send test reminder immediately to all registered users"""
+    print("Sending test reminders...")
+    df = get_dataframe()
+    for i, row in df.iterrows():
+        chat_id = row.get("Chat ID")
+        if pd.notna(chat_id) and chat_id != "" and chat_id != 0:
+            try:
+                chat_id = int(float(chat_id))
+                lesson_type = row.get("Lesson Type", "a class")
+                if not lesson_type or pd.isna(lesson_type):
+                    lesson_type = "a class"
+                teaching_date = row.get("Teaching Date", "TBD")
+                teacher_name = row.get("Teacher Name", "")
+                print(f"Attempting to send to {teacher_name} (Chat ID: {chat_id})")
+                send_message(chat_id, f"TEST: You have {lesson_type} on {teaching_date}.")
+                print(f"Successfully sent test to {teacher_name}")
+            except Exception as e:
+                print(f"Error sending to {row.get('Teacher Name', 'Unknown')}: {e}")
+
 def listen_for_new_users():
-    print("Listening for new Telegram messages... ")
+    print("Listening for new Telegram messages...")
     offset = None
     while True:
-        updates = get_updates(offset)
-        for update in updates:
-            offset = update["update_id"] + 1
-            if "message" in update:
-                chat_id = update["message"]["chat"]["id"]
-                text = update["message"].get("text", "").strip()
-                if text.lower().startswith("/start"):
-                    send_message(chat_id, "Hi! Please reply with your full name.")
-                else:
-                    register_teacher(chat_id, text)
+        try:
+            updates = get_updates(offset)
+            for update in updates:
+                offset = update["update_id"] + 1
+                if "message" in update:
+                    chat_id = update["message"]["chat"]["id"]
+                    text = update["message"].get("text", "").strip()
+                    if text.lower().startswith("/start"):
+                        send_message(chat_id, "Hi! Please reply with your full name.")
+                    else:
+                        register_teacher(chat_id, text)
+        except Exception as e:
+            print(f"Error in listen_for_new_users: {e}")
         time.sleep(5)
 
 # scheduler
@@ -125,6 +148,10 @@ def start_scheduler():
 if __name__ == "__main__":
     import threading
     threading.Thread(target=listen_for_new_users, daemon=True).start()
-    print("Bot started using Google Sheets... ")
+    print("Bot started using Google Sheets...")
+    
+    # Send test message after 5 seconds
+    time.sleep(5)
+    test_reminders_now()
     
     start_scheduler()
