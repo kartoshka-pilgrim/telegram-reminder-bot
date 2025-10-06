@@ -32,7 +32,11 @@ def send_message(chat_id, text):
 def get_updates(offset=None):
     params = {"timeout": 100, "offset": offset}
     r = requests.get(f"{API_URL}/getUpdates", params=params)
-    return r.json()["result"]
+    response = r.json()
+    if "result" not in response:
+        print(f"Telegram API Error: {response}")
+        return []
+    return response["result"]
 
 # sheet helpers
 def get_dataframe():
