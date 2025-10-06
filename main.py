@@ -21,7 +21,7 @@ gc = gspread.authorize(creds)
 
 # sheet
 SHEET_ID = "https://docs.google.com/spreadsheets/d/1pJL1GixBfPTSlQPORbpJrHTj9S6dDEcDhJ-feVQDyc0/edit?usp=sharing"
-sheet = gc.open(SHEET_NAME).sheet1
+sheet = gc.open_by_key(SHEET_ID).sheet1
 
 # telegram
 API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
